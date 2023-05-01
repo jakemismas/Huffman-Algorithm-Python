@@ -1,6 +1,4 @@
-Sure, here is the revised `README.md` with emojis added to each header:
-
-# 🗜️ Huffman Encoding and Decoding
+# 🔐 Huffman Encoding and Decoding
 
 This Python script demonstrates how to perform Huffman encoding and decoding on a given text file. Huffman coding is a lossless data compression algorithm that assigns shorter codes to more frequently occurring characters, and longer codes to less frequently occurring characters. This results in a compressed representation of the original text.
 
