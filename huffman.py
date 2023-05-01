@@ -1,135 +1,95 @@
 import sys
 import heapq
+from collections import Counter
+from contextlib import contextmanager
 
+# Context manager for opening and closing files
+@contextmanager
+def open_file(file_name, mode='r'):
+    f = open(file_name, mode)
+    try:
+        yield f
+    finally:
+        f.close()
+
+# Calculate character frequencies in a file
 def file_character_frequencies(file_name):
-    text = open(file_name, 'r').read()
-    
-    freqs = {}
-    
-    for character in text:
-        if character in freqs.keys():
-            freqs[character] = freqs[character] + 1
-        else:
-            freqs[character] = 1
+    with open_file(file_name, 'r') as f:
+        text = f.read()
+    return Counter(text)
 
-    return freqs
-
+# PriorityTuple class for sorting based on the first item
 class PriorityTuple(tuple):
-    """A specialization of tuple that compares only its first item when sorting.
-    Create one using double parens e.g. PriorityTuple((x, (y, z))) """
     def __lt__(self, other):
         return self[0] < other[0]
 
-    def __le__(self, other):
-        return self[0] <= other[0]
-
-    def __gt__(self, other):
-        return self[0] > other[0]
-
-    def __ge__(self, other):
-        return self[0] >= other[0]
-
-    def __eq__(self, other):
-        return self[0] == other[0]
-
-    def __ne__(self, other):
-        x = self.__eq__(other)
-        return not x
-
+# Convert frequencies to a heap
 def to_heap(freqs):
     freqs = sorted(freqs.items())
-    freqs = [(t[1], t[0]) for t in freqs]
-    heap = [[freq,[char, '']] for freq, char in freqs]
-    heapq.heapify(heap)
-    return heap
+    return [PriorityTuple((freq, (char, ''))) for freq, char in freqs]
 
+# Update node codes with '0' or '1'
 def update_node_code(nodes, LR):
     for node in nodes:
         node[1] = LR + node[1]
     return nodes
 
+# Build Huffman tree from the heap
 def build_tree(heap):
-
-    if len(heap) == 1:
-        only = heapq.heappop(heap)
-        update_node_code(only[1:], '0')
-        heapq.heappush(heap, [only[0]] + only[1:])
-
+    heapq.heapify(heap)
     while len(heap) > 1:
         left = heapq.heappop(heap)
         right = heapq.heappop(heap)
 
-        left[1:] = update_node_code(left[1:], '0')
-        right[1:] = update_node_code(right[1:], '1')
+        update_node_code(left[1:], '0')
+        update_node_code(right[1:], '1')
 
-        heapq.heappush(heap, [left[0] + right[0]] + left[1:] + right[1:])
+        heapq.heappush(heap, PriorityTuple((left[0] + right[0], left[1:] + right[1:])))
 
-    return heap
+    return heap[0][1:]
 
+# Generate Huffman codes from character frequencies
 def huffman_codes_from_frequencies(freqs):
-
     heap = to_heap(freqs)
+    tree = build_tree(heap)
+    return {char: code for char, code in tree}
 
-    heap = build_tree(heap)
-
-    heapq.heappop(heap[0])
-
-    encoding = dict(heap[0])
-
-    return encoding
-
-
+# Main function to generate Huffman codes from a file
 def huffman_letter_codes_from_file_contents(file_name):
-    """WE WILL GRADE BASED ON THIS FUNCTION."""
-    # Suggested strategy...
     freqs = file_character_frequencies(file_name)
     return huffman_codes_from_frequencies(freqs)
 
-
+# Encode a file using the given Huffman codes
 def encode_file_using_codes(file_name, letter_codes):
-    """Provided to help you play with your code."""
-    contents = ""
-    with open(file_name) as f:
+    with open_file(file_name) as f:
         contents = f.read()
     file_name_encoded = file_name + "_encoded"
-    with open(file_name_encoded, 'w') as fout:
-        for c in contents:
-            fout.write(letter_codes[c])
+    with open_file(file_name_encoded, 'w') as fout:
+        fout.write(''.join(letter_codes[c] for c in contents))
     print("Wrote encoded text to {}".format(file_name_encoded))
 
-
+# Decode an encoded file using the given Huffman codes
 def decode_file_using_codes(file_name_encoded, letter_codes):
-    """Provided to help you play with your code."""
-    contents = ""
-    with open(file_name_encoded) as f:
+    with open_file(file_name_encoded) as f:
         contents = f.read()
     file_name_encoded_decoded = file_name_encoded + "_decoded"
     codes_to_letters = {v: k for k, v in letter_codes.items()}
-    with open(file_name_encoded_decoded, 'w') as fout:
-        num_decoded_chars = 0
+    with open_file(file_name_encoded_decoded, 'w') as fout:
         partial_code = ""
-        while num_decoded_chars < len(contents):
-            partial_code += contents[num_decoded_chars]
-            num_decoded_chars += 1
+        for c in contents:
+            partial_code += c
             letter = codes_to_letters.get(partial_code)
             if letter:
                 fout.write(letter)
                 partial_code = ""
     print("Wrote decoded text to {}".format(file_name_encoded_decoded))
 
-
 def main():
-    """Provided to help you play with your code."""
-    import pprint
     frequencies = file_character_frequencies(sys.argv[1])
-    pprint.pprint(frequencies)
     codes = huffman_codes_from_frequencies(frequencies)
-    pprint.pprint(codes)
 
     encode_file_using_codes(sys.argv[1], codes)
     decode_file_using_codes(sys.argv[1]+'_encoded', codes)
 
-
 if __name__ == '__main__':
-    """We are NOT grading you based on main, this is for you to play with."""
     main()
