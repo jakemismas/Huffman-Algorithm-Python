@@ -1,57 +1,66 @@
-# huffman-by-python
-This small python project was done for CS 320, Algorithms Theory and Practice.
+Sure, here is the revised `README.md` with emojis added to each header:
 
-## Objective
+# 🗜️ Huffman Encoding and Decoding
 
-Learn how to implement the Huffman encoding algorithm.
+This Python script demonstrates how to perform Huffman encoding and decoding on a given text file. Huffman coding is a lossless data compression algorithm that assigns shorter codes to more frequently occurring characters, and longer codes to less frequently occurring characters. This results in a compressed representation of the original text.
 
-## Instructions
+## 🌟 Features
 
-You must use the heapq module from python to implement heap functions to create a Huffman code for text character encoding.
+- Calculate character frequencies in a given file
+- Generate Huffman codes based on character frequencies
+- Encode a text file using the generated Huffman codes
+- Decode an encoded file back to its original form
 
-The heapq methods that you would be using are:
+## 📚 Requirements
 
-- heapify(): To create the heap
-- heappop(): To extract minimum element from the heap
-- heappush(): To insert the element after merging into the heap
+- Python 3.6+ 🐍
 
-Make a new file named huffman.py.
+## 🚀 Usage
 
-## Usage
-When provided with an input file (in the same folder as huffman.py) named example.txt containing a message, a sample usage would be:
-python3 huffman.py example.txt
+You can run the script by executing the following command:
 
-When executed, the code will produce two new text files, example.txt_encoded, which contains the encoded message, and example.txt_encoded_decoded, which contains the decoded message.
+```
+python huffman.py <input_file>
+```
 
-## Further Details
+Replace `<input_file>` with the path to the text file you want to compress.
 
-We will test your code by calling the function named huffman_letter_codes_from_file_contents(file_name). It takes the name of a file as input and it returns a Huffman code for the letters in the file, in the form of a dict mapping from letters to a binary code as a string. Note that the return from huffman_letter_codes_from_file_contents is a dict from string to string. Since Python does not have a type for single characters, we represent them as strings of length one.
+The script will generate an encoded file with the suffix `_encoded` and a decoded file with the suffix `_encoded_decoded`.
 
-For example, when given the example text file provided (example.txt), the method huffman_letter_codes_from_file_contents might return the following dictionary:
+## 📖 Example
 
-{'H': '00000', 'u': '00001', 'W': '00010', '3': '00011', 'c': '00100', '0': '00101', 'd': '00110', 'S': '00111', 'C': '01000', '\n': '01001', 'm': '0101', '!': '01100', 'g': '01101', 'n': '0111',
-    ' ': '100', 't': '1010', 'e': '1011', 's': '1100', 'i': '1101', '.': '11100', 'l': '11101', 'o': '11110', 'r': '111110', '2': '111111'}
+Suppose you have a text file named `example.txt`. You can run the script as follows:
 
-Using these Huffman encodings, the file example.txt_encoded would contain:
+```
+python huffman.py example.txt
+```
 
-000001011111011110111110100010000011110000011111111001011001100101000001001101011011110101100111001000001011010111101010111111101001101110010000100111100101010111010111011010110001001
+This will create two new files: `example.txt_encoded` (the encoded file) and `example.txt_encoded_decoded` (the decoded file). The decoded file should have the same content as the original `example.txt` file.
 
-Then decoding, we should recover the original message in example.txt. That is, the file example.txt_encoded_decoded would contain:
+## 🛠️ Implementation Details
 
-Hello CS 320 students. Winter is comming!
+The script consists of several functions to perform Huffman encoding and decoding:
 
-(That’s how they spell it in Westeros.)
+- `file_character_frequencies(file_name)`: Calculates character frequencies in a given file
+- `huffman_letter_codes_from_file_contents(file_name)`: Generates Huffman codes for characters in a given file
+- `encode_file_using_codes(file_name, letter_codes)`: Encodes a file using the provided Huffman codes
+- `decode_file_using_codes(file_name_encoded, letter_codes)`: Decodes an encoded file using the provided Huffman codes
 
-## Testing
+Additionally, there are some helper functions and a `PriorityTuple` class to assist in building the Huffman tree and managing the heap.
 
-Testing your Huffman codes is not trivial. Python dictionaries don't have a guaranteed order of iteration, but you can compare two dictionaries for equality. However, a Huffman code for a given letter frequency is not unique. There are many Huffman codes for a given letter frequency that are all equally optimal, in terms of the compression they give.
+## 🌱 Possible Code Enhancements
+Below are some possible enhancements that could be made to the code:
 
-## Prefix property
+- Parallelization: Use parallel processing to encode and decode larger files more quickly. This could be achieved using Python's multiprocessing or concurrent.futures modules.
 
-So, to determine if a Huffman code is correct, you should at least verify that it is a prefix code. A prefix code is a variable length encoding where no letter's code is a prefix of any other code. See the example above, the letter “e” was given code “000”. No other code begins with “000”, so it is not a prefix of any other code. This property is true for all the other codes too.
+- Binary file handling: Modify the script to handle binary files, allowing compression and decompression of a wider range of file types.
 
-While you could verify this property by hand, it's more fun to see if files make a successful “round trip” through the encoding and decoding process. We have given you code to do this, and you can see above how to call it. After encoding and decoding an example file, you should be able to diff the original and the “_encoded_decoded”, and find no difference.
+- File size optimization: In the current implementation, the encoded file is saved as a text file with '0's and '1's. It can be further optimized by saving the encoded file as a binary file, where each group of 8 bits represents a byte.
 
-## Optimality of Compression
+- Performance metrics: Display performance metrics, such as compression ratio, encoding time, and decoding time, to provide users with feedback on the efficiency of the algorithm.
 
-Huffman codes are optimal prefix codes for per-symbol encoding. Here our symbols are just letters. While there are many possible Huffman codes for given letter frequencies, they will all result in a minimal length of the encoded file.
+- Adaptive Huffman coding: Implement adaptive Huffman coding, which updates the tree dynamically as the data is being encoded or decoded. This would make the algorithm more efficient for compressing files with varying character distributions.
+
+## 📄 License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
